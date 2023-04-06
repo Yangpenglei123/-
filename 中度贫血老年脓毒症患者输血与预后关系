@@ -364,6 +364,335 @@ data:  data.base[[i]] by truRed24
 W = 1188372, p-value < 0.00000000000000022
 alternative hypothesis: true location shift is not equal to 0
 
+##血红蛋白最低值分布情况
+library(ggplot2)
+library(ggsci)
+library(patchwork)
+
+#直方图绘制
+Hb.hist<- ggplot(data =data.base,aes(x=Hb_low))+geom_histogram(alpha = 0.7,binwidth = 0.1,
+                aes(y=..density..,fill=truRed24),color="white",position = "identity")+
+  scale_color_manual(values = c("red", "#00468BE5"))+
+  scale_fill_manual(values = c("orange", "#0099B4E5"))+
+  geom_density(alpha = 1,linewidth=1,aes(color=truRed24))+labs(x="Hb(g/dL)")+theme_bw()+
+  theme(axis.text = element_text(size = 16),axis.title = element_text(size = 20),
+        legend.title = element_blank(),legend.text = element_text(size=14))
+Hb.hist
+
+#箱线图绘制
+options(scipen=999)
+library(ggpubr)
+compare <- list(c("未输血组","输血组"))
+boxgraph <-   ggboxplot(data.base,x="truRed24",y="Hb_low",color ="truRed24",size = 1,bxp.errorbar=TRUE)+
+  scale_color_manual(values = c("red", "#00468BE5"))+
+  stat_compare_means(comparisons = compare,method = "wilcox.test",
+                     symnum.args = list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1),
+                                        symbols = c("***", "**", "*", ".", "ns")),
+                     bracket.size = 0.8,tip.length = 0.05)+
+  theme_bw()+labs(x="",y="Hb(d/dL)")+ylim(6,10)+
+  theme(axis.text = element_text(size = 16),axis.title = element_text(size = 20),
+        legend.title = element_blank(),legend.text = element_text(size = 14))
+boxgraph
+
+#将血红蛋白分组
+data.base$Hb_group <- cut(data.base$Hb_low,breaks=c(7,8,9),right = TRUE,include.lowest=TRUE)
+
+#查看不同血红蛋白浓度输血组未输血组死亡率
+table.p <- table(data.base$truRed24)
+prop.table(table.p)
+##绘制频数图
+Hb.bar <- ggplot(data.base,aes(x=truRed24,fill=HD))+
+  geom_bar(position = "fill")+scale_fill_brewer()+facet_grid(~Hb_group)+theme_bw()+
+  labs(x= "24小时内输血",y="患者比例")
+Hb.bar
+###计算输血与死亡关系
+###计算输血与死亡关系
+ table.truRed24<- table(data.base$truRed24,data.base$HD)
+ addmargins(table.truRed24)
+          
+           存活 死亡  Sum
+  未输血组 1526  368 1894
+  输血组    864  123  987
+  Sum      2390  491 2881
+ prop.table(table.truRed24,margin=1)
+          
+                存活      死亡
+  未输血组 0.8057022 0.1942978
+  输血组   0.8753799 0.1246201
+prop.table(table.truRed24,margin=2)
+          
+                存活      死亡
+  未输血组 0.6384937 0.7494908
+  输血组   0.3615063 0.2505092
+chisq.test(table.truRed24)
+
+	Pearson's Chi-squared test with Yates' continuity correction
+
+data:  table.truRed24
+X-squared = 21.792, df = 1, p-value = 0.000003039
+
+tabpct(data.base$truRed24,data.base$HD)
+
+Original table 
+                  data.base$HD
+data.base$truRed24  存活  死亡  Total
+          未输血组  1526   368   1894
+          输血组     864   123    987
+          Total     2390   491   2881
+
+Row percent 
+                  data.base$HD
+data.base$truRed24    存活    死亡  Total
+          未输血组    1526     368   1894
+                    (80.6)  (19.4)  (100)
+          输血组       864     123    987
+                    (87.5)  (12.5)  (100)
+
+Column percent 
+                  data.base$HD
+data.base$truRed24  存活       %  死亡       %
+          未输血组  1526  (63.8)   368  (74.9)
+          输血组     864  (36.2)   123  (25.1)
+          Total     2390   (100)   491   (100)
+
+cc(data.base$HD,data.base$truRed24)
+
+            data.base$truRed24
+data.base$HD 未输血组 输血组 Total
+       存活      1526    864  2390
+       死亡       368    123   491
+       Total     1894    987  2881
+
+OR =  0.59 
+95% CI =  0.47, 0.74  
+Chi-squared = 22.28, 1 d.f., P value = 0
+Fisher's exact test (2-sided) P value = 0 
 
 
+#标准化数据
+> library(dplyr)
+> # data.baseA <- data.base %>%
+> #   mutate_if(is.numeric, scale)
+> #   as.data.frame(data.baseA)
+> data.baseA <- data.base
+> names(data.baseA )
+ [1] "Sex"        "Age"        "SOFA"       "Lac"        "PH"         "PO2"        "PCO2"       "HCT"       
+ [9] "PLT"        "WBC"        "BUN"        "Cr"         "Glucose"    "Na"         "K"          "PT"        
+[17] "APTT"       "HR"         "SBP"        "DBP"        "MBP"        "RR"         "T_min"      "T_max"     
+[25] "SPO2"       "SAPSiii"    "AKI"        "Vaso"       "Shock"      "ventil"     "CHF"        "COPD"      
+[33] "Renal"      "Charlson"   "Liver"      "Diabetes"   "los_hosp"   "los_icu"    "BMI"        "Surtime"   
+[41] "Death28"    "truRed24"   "Hb_low"     "Hb_max"     "hosDead"    "subject_id" "HD"         "D28"       
+[49] "Hb_group"  
+> 
+> data.baseA[, c("Age","SOFA","Lac","PH","PO2","PCO2","HCT","PLT","WBC","BUN","Cr","Glucose",
++                "Na","K","PT","APTT","HR","SBP","DBP","MBP","RR","T_min","T_max","SPO2",
++                "SAPSiii","los_hosp","los_icu","BMI","Hb_low",
++                "Hb_max")] <- scale(data.baseA[, c("Age","SOFA","Lac","PH","PO2","PCO2","HCT",
++                                                   "PLT","WBC","BUN","Cr","Glucose", "Na","K","PT","APTT","HR",
++                                                   "SBP","DBP","MBP","RR","T_min","T_max","SPO2","SAPSiii",
++                                                   "los_hosp","los_icu","BMI","Hb_low","Hb_max")])
+> 
+> 
+> 
+> #建立训练集及测试集
+> library(caret)
+载入需要的程辑包：lattice
+
+载入程辑包：‘lattice’
+
+The following object is masked from ‘package:epiDisplay’:
+
+    dotplot
+
+
+载入程辑包：‘caret’
+
+The following object is masked from ‘package:survival’:
+
+    cluster
+
+> index<-createDataPartition(data.baseA$HD,p=0.7)
+> train<- data.baseA[index$Resample1,]
+> test <- data.baseA[-index$Resample1,]
+> names(train)
+ [1] "Sex"        "Age"        "SOFA"       "Lac"        "PH"         "PO2"        "PCO2"       "HCT"       
+ [9] "PLT"        "WBC"        "BUN"        "Cr"         "Glucose"    "Na"         "K"          "PT"        
+[17] "APTT"       "HR"         "SBP"        "DBP"        "MBP"        "RR"         "T_min"      "T_max"     
+[25] "SPO2"       "SAPSiii"    "AKI"        "Vaso"       "Shock"      "ventil"     "CHF"        "COPD"      
+[33] "Renal"      "Charlson"   "Liver"      "Diabetes"   "los_hosp"   "los_icu"    "BMI"        "Surtime"   
+[41] "Death28"    "truRed24"   "Hb_low"     "Hb_max"     "hosDead"    "subject_id" "HD"         "D28"       
+[49] "Hb_group"  
+> 
+> ##构建全因素模型
+> fit.glm <- glm(formula=HD~truRed24+Sex +Age +SOFA +Lac +PH +PO2 +PCO2 +HCT +PLT +WBC +
++                  +BUN +Cr +Glucose +Na +K + +PT +APTT +HR +SBP +DBP +
++                  MBP +RR +T_min +T_max +SPO2 +SAPSiii +AKI +Shock +ventil+
++                  +CHF +COPD +Renal +Charlson+Liver +Diabetes+
++                  BMI+Hb_low +Hb_max,data = train,family ="binomial" )
+> summary(fit.glm)
+
+Call:
+glm(formula = HD ~ truRed24 + Sex + Age + SOFA + Lac + PH + PO2 + 
+    PCO2 + HCT + PLT + WBC + +BUN + Cr + Glucose + Na + K + +PT + 
+    APTT + HR + SBP + DBP + MBP + RR + T_min + T_max + SPO2 + 
+    SAPSiii + AKI + Shock + ventil + +CHF + COPD + Renal + Charlson + 
+    Liver + Diabetes + BMI + Hb_low + Hb_max, family = "binomial", 
+    data = train)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-2.5744  -0.4131  -0.2282  -0.1261   3.0263  
+
+Coefficients:
+                Estimate Std. Error z value             Pr(>|z|)    
+(Intercept)    -4.268927   0.357719 -11.934 < 0.0000000000000002 ***
+truRed24输血组 -0.666998   0.213598  -3.123             0.001792 ** 
+SexM           -0.032019   0.168878  -0.190             0.849626    
+Age             0.294853   0.086771   3.398             0.000679 ***
+SOFA           -0.006231   0.081401  -0.077             0.938985    
+Lac             0.245540   0.095886   2.561             0.010445 *  
+PH              0.128697   0.105355   1.222             0.221875    
+PO2            -0.087037   0.086732  -1.004             0.315611    
+PCO2            0.117191   0.085408   1.372             0.170024    
+HCT             0.260065   0.132724   1.959             0.050061 .  
+PLT             0.041915   0.084719   0.495             0.620770    
+WBC            -0.003226   0.075653  -0.043             0.965982    
+BUN             0.169893   0.106292   1.598             0.109964    
+Cr             -0.169774   0.109960  -1.544             0.122599    
+Glucose         0.070779   0.076121   0.930             0.352465    
+Na              0.016067   0.072506   0.222             0.824631    
+K              -0.169385   0.080242  -2.111             0.034778 *  
+PT              0.194842   0.069018   2.823             0.004757 ** 
+APTT            0.054451   0.078294   0.695             0.486761    
+HR             -0.008717   0.082470  -0.106             0.915824    
+SBP            -0.205502   0.119432  -1.721             0.085312 .  
+DBP            -0.077144   0.160544  -0.481             0.630862    
+MBP             0.106967   0.189685   0.564             0.572810    
+RR              0.359288   0.089281   4.024           0.00005716 ***
+T_min          -0.038130   0.078500  -0.486             0.627159    
+T_max          -0.019287   0.081834  -0.236             0.813676    
+SPO2           -0.180432   0.081874  -2.204             0.027540 *  
+SAPSiii         0.938541   0.099097   9.471 < 0.0000000000000002 ***
+AKIYES          0.329516   0.181097   1.820             0.068827 .  
+Shock休克       0.600880   0.194195   3.094             0.001973 ** 
+ventilYES       0.796229   0.208113   3.826             0.000130 ***
+CHFYES         -0.210352   0.178224  -1.180             0.237895    
+COPDYES        -0.204699   0.185805  -1.102             0.270596    
+RenalYES       -0.539392   0.210085  -2.567             0.010244 *  
+Charlson        0.225064   0.043042   5.229           0.00000017 ***
+LiverYES        0.295502   0.246309   1.200             0.230249    
+DiabetesYES    -0.243999   0.186503  -1.308             0.190777    
+BMI            -0.146301   0.080935  -1.808             0.070662 .  
+Hb_low          0.003660   0.128859   0.028             0.977339    
+Hb_max         -0.174264   0.091697  -1.900             0.057378 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 1842.6  on 2016  degrees of freedom
+Residual deviance: 1099.1  on 1977  degrees of freedom
+AIC: 1179.1
+
+Number of Fisher Scoring iterations: 6
+
+> exp(coef(fit.glm ))
+   (Intercept) truRed24输血组           SexM            Age           SOFA            Lac             PH 
+    0.01399679     0.51324727     0.96848852     1.34292844     0.99378845     1.27831080     1.13734521 
+           PO2           PCO2            HCT            PLT            WBC            BUN             Cr 
+    0.91664275     1.12433418     1.29701446     1.04280627     0.99677874     1.18517826     0.84385573 
+       Glucose             Na              K             PT           APTT             HR            SBP 
+    1.07334399     1.01619655     0.84418368     1.21511841     1.05596097     0.99132113     0.81423834 
+           DBP            MBP             RR          T_min          T_max           SPO2        SAPSiii 
+    0.92575682     1.11289704     1.43230983     0.96258795     0.98089766     0.83490973     2.55624810 
+        AKIYES      Shock休克      ventilYES         CHFYES        COPDYES       RenalYES       Charlson 
+    1.39029473     1.82372222     2.21716317     0.81029905     0.81489236     0.58310250     1.25240311 
+      LiverYES    DiabetesYES            BMI         Hb_low         Hb_max 
+    1.34380038     0.78348848     0.86389792     1.00366705     0.84007501 
+> exp(confint(fit.glm))
+Waiting for profiling to be done...
+                     2.5 %     97.5 %
+(Intercept)    0.006827602 0.02778898
+truRed24输血组 0.335866102 0.77670772
+SexM           0.695372595 1.34898045
+Age            1.133458386 1.59317849
+SOFA           0.846389768 1.16492806
+Lac            1.060736123 1.54547147
+PH             0.925750228 1.40009036
+PO2            0.770161972 1.08253685
+PCO2           0.950001413 1.32844005
+HCT            0.999223168 1.68189610
+PLT            0.881608168 1.22948468
+WBC            0.858568215 1.15541051
+BUN            0.961580680 1.45962101
+Cr             0.675272944 1.04064220
+Glucose        0.924158056 1.24610223
+Na             0.882371796 1.17304938
+K              0.720960312 0.98769432
+PT             1.062147126 1.39298735
+APTT           0.903841672 1.22888889
+HR             0.842892403 1.16494284
+SBP            0.643505818 1.02811976
+DBP            0.678704833 1.27392431
+MBP            0.761821511 1.60189038
+RR             1.203450395 1.70832263
+T_min          0.829372327 1.12828868
+T_max          0.834630678 1.15059854
+SPO2           0.710438498 0.97904841
+SAPSiii        2.109811950 3.11257582
+AKIYES         0.976085449 1.98692039
+Shock休克      1.244495481 2.66617923
+ventilYES      1.482026789 3.35390567
+CHFYES         0.570282488 1.14758842
+COPDYES        0.564353186 1.16998997
+RenalYES       0.385002199 0.87783551
+Charlson       1.151230901 1.36308000
+LiverYES       0.824947486 2.16887112
+DiabetesYES    0.542285801 1.12731152
+BMI            0.735792747 1.01085225
+Hb_low         0.780095155 1.29342101
+Hb_max         0.700571851 1.00406681
+> exp(cbind(OR=coef(fit.glm),confint(fit.glm)))
+Waiting for profiling to be done...
+                       OR       2.5 %     97.5 %
+(Intercept)    0.01399679 0.006827602 0.02778898
+truRed24输血组 0.51324727 0.335866102 0.77670772
+SexM           0.96848852 0.695372595 1.34898045
+Age            1.34292844 1.133458386 1.59317849
+SOFA           0.99378845 0.846389768 1.16492806
+Lac            1.27831080 1.060736123 1.54547147
+PH             1.13734521 0.925750228 1.40009036
+PO2            0.91664275 0.770161972 1.08253685
+PCO2           1.12433418 0.950001413 1.32844005
+HCT            1.29701446 0.999223168 1.68189610
+PLT            1.04280627 0.881608168 1.22948468
+WBC            0.99677874 0.858568215 1.15541051
+BUN            1.18517826 0.961580680 1.45962101
+Cr             0.84385573 0.675272944 1.04064220
+Glucose        1.07334399 0.924158056 1.24610223
+Na             1.01619655 0.882371796 1.17304938
+K              0.84418368 0.720960312 0.98769432
+PT             1.21511841 1.062147126 1.39298735
+APTT           1.05596097 0.903841672 1.22888889
+HR             0.99132113 0.842892403 1.16494284
+SBP            0.81423834 0.643505818 1.02811976
+DBP            0.92575682 0.678704833 1.27392431
+MBP            1.11289704 0.761821511 1.60189038
+RR             1.43230983 1.203450395 1.70832263
+T_min          0.96258795 0.829372327 1.12828868
+T_max          0.98089766 0.834630678 1.15059854
+SPO2           0.83490973 0.710438498 0.97904841
+SAPSiii        2.55624810 2.109811950 3.11257582
+AKIYES         1.39029473 0.976085449 1.98692039
+Shock休克      1.82372222 1.244495481 2.66617923
+ventilYES      2.21716317 1.482026789 3.35390567
+CHFYES         0.81029905 0.570282488 1.14758842
+COPDYES        0.81489236 0.564353186 1.16998997
+RenalYES       0.58310250 0.385002199 0.87783551
+Charlson       1.25240311 1.151230901 1.36308000
+LiverYES       1.34380038 0.824947486 2.16887112
+DiabetesYES    0.78348848 0.542285801 1.12731152
+BMI            0.86389792 0.735792747 1.01085225
+Hb_low         1.00366705 0.780095155 1.29342101
+Hb_max         0.84007501 0.700571851 1.00406681
 
