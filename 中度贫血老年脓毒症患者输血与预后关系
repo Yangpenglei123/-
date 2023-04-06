@@ -876,3 +876,189 @@ plot(ps.Hb, type = "jitter") #散点图检查匹配效果
 plot(ps.Hb, type = "qq", interactive=FALSE) qq图显示匹配效果
 plot(ps.Hb, type='hist') 直方图显示匹配效果
 plot(summary(ps.Hb))
+> ##提取数据
+> ps.Hbdata <- match.data(ps.Hb,group = "all",
++                         distance = "distance",
++                         weights = "weights",
++                         subclass= "subclass",
++                         data = NULL,
++                         include.s.weights = TRUE,
++                         drop.unmatched = TRUE)
+> fit.ps.Hb <- glm(data =ps.Hbdata, HD~truRed24,family = "binomial")
+> summary(fit.ps.Hb)
+
+Call:
+glm(formula = HD ~ truRed24, family = "binomial", data = ps.Hbdata)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.5835  -0.5835  -0.4590  -0.4590   2.1460  
+
+Coefficients:
+               Estimate Std. Error z value             Pr(>|z|)    
+(Intercept)     -1.6843     0.1048 -16.076 < 0.0000000000000002 ***
+truRed24输血组  -0.5129     0.1646  -3.117              0.00183 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 1057.3  on 1379  degrees of freedom
+Residual deviance: 1047.3  on 1378  degrees of freedom
+AIC: 1051.3
+
+Number of Fisher Scoring iterations: 4
+
+> exp(cbind(OR=coef(fit.ps.Hb),confint(fit.ps.Hb)))
+Waiting for profiling to be done...
+                      OR     2.5 %    97.5 %
+(Intercept)    0.1855670 0.1503574 0.2268157
+truRed24输血组 0.5987654 0.4321977 0.8246294
+
+> table2 <- tableStack(vars=1:44, by=truRed24,dataFrame= ps.Hbdata,prevalence = TRUE,test = TRUE,decimal=2)
+> table2
+                  未输血组              输血组                 Test stat.            P value
+Total             690                   690                                                 
+                                                                                            
+Sex = M                                                        Chisq. (1 df) = 0.012 0.914  
+  prevalence      370/690 (53.62%)      368/690 (53.33%)                                    
+                                                                                            
+Age                                                            Ranksum test          0.2877 
+  median(IQR)     76.69 (70.82,82.16)   77.32 (71.31,82.85)                                 
+                                                                                            
+SOFA                                                           Ranksum test          0.4473 
+  median(IQR)     3 (2,5)               3 (2,5)                                             
+                                                                                            
+Lac                                                            Ranksum test          0.2403 
+  median(IQR)     2.6 (1.8,3.7)         2.65 (1.9,3.9)                                      
+                                                                                            
+PH                                                             Ranksum test          0.4446 
+  median(IQR)     7.32 (7.27,7.37)      7.32 (7.26,7.36)                                    
+                                                                                            
+PO2                                                            Ranksum test          0.6792 
+  median(IQR)     94 (74,119.75)        92 (74,119)                                         
+                                                                                            
+PCO2                                                           Ranksum test          0.4157 
+  median(IQR)     45 (41,51)            46 (41,51)                                          
+                                                                                            
+HCT                                                            Ranksum test          0.7135 
+  median(IQR)     24 (22.9,25.2)        24 (22.72,25.1)                                     
+                                                                                            
+PLT                                                            Ranksum test          0.2865 
+  median(IQR)     132 (96,174)          125 (92,177.75)                                     
+                                                                                            
+WBC                                                            Ranksum test          0.4284 
+  median(IQR)     9.15 (6.6,12.1)       9.4 (6.8,12.2)                                      
+                                                                                            
+BUN                                                            Ranksum test          0.4216 
+  median(IQR)     22 (16,34.75)         23 (16,35)                                          
+                                                                                            
+Cr                                                             Ranksum test          0.5554 
+  median(IQR)     1.1 (0.8,1.7)         1.1 (0.9,1.6)                                       
+                                                                                            
+Glucose                                                        Ranksum test          0.3095 
+  median(IQR)     111 (95,132)          114 (97,133)                                        
+                                                                                            
+Na                                                             Ranksum test          0.5547 
+  median(IQR)     137 (134,139)         137 (135,139)                                       
+                                                                                            
+K                                                              Ranksum test          0.6448 
+  median(IQR)     4 (3.6,4.3)           4 (3.6,4.3)                                         
+                                                                                            
+PT                                                             Ranksum test          0.6658 
+  median(IQR)     16.1 (14.5,18.2)      16.1 (14.5,18.6)                                    
+                                                                                            
+APTT                                                           Ranksum test          0.443  
+  median(IQR)     37 (31.3,50.88)       37.7 (31.6,49.82)                                   
+                                                                                            
+HR                                                             Ranksum test          0.8001 
+  median(IQR)     82.36 (75.68,91.23)   82.45 (75.76,90.46)                                 
+                                                                                            
+SBP                                                            Ranksum test          0.2805 
+  median(IQR)     112.02 (106.25,118.3) 110.91 (105.56,118.76)                              
+                                                                                            
+DBP                                                            Ranksum test          0.6326 
+  median(IQR)     54.73 (50.04,59.28)   54.46 (49.53,59.15)                                 
+                                                                                            
+MBP                                                            Ranksum test          0.7001 
+  median(IQR)     72.2 (67.77,76.56)    71.54 (67.67,76.28)                                 
+                                                                                            
+RR                                                             Ranksum test          0.4614 
+  median(IQR)     17.72 (15.96,20.17)   17.75 (15.91,19.7)                                  
+                                                                                            
+T_min                                                          Ranksum test          0.888  
+  median(IQR)     36.11 (35.4,36.5)     36.1 (35.4,36.44)                                   
+                                                                                            
+T_max                                                          Ranksum test          0.4574 
+  median(IQR)     37.3 (37,37.78)       37.39 (37,37.78)                                    
+                                                                                            
+SPO2                                                           Ranksum test          0.1462 
+  median(IQR)     93 (91,95)            93 (91,95)                                          
+                                                                                            
+SAPSiii                                                        Ranksum test          0.3465 
+  median(IQR)     47 (33,71.75)         49 (35,71)                                          
+                                                                                            
+AKI = YES                                                      Chisq. (1 df) = 0.003 0.9567 
+  prevalence      387/690 (56.09%)      388/690 (56.23%)                                    
+                                                                                            
+Vaso                                                           Ranksum test          0.6943 
+  median(IQR)     0 (0,0)               0 (0,0)                                             
+                                                                                            
+Shock = 休克                                                   Chisq. (1 df) = 0.374 0.5408 
+  prevalence      130/690 (18.84%)      139/690 (20.14%)                                    
+                                                                                            
+ventil = YES                                                   Chisq. (1 df) = 0.716 0.3973 
+  prevalence      495/690 (71.74%)      509/690 (73.77%)                                    
+                                                                                            
+CHF = YES                                                      Chisq. (1 df) = 0.029 0.8642 
+  prevalence      230/690 (33.33%)      233/690 (33.77%)                                    
+                                                                                            
+COPD = YES                                                     Chisq. (1 df) = 0.014 0.9047 
+  prevalence      193/690 (27.97%)      195/690 (28.26%)                                    
+                                                                                            
+Renal = YES                                                    Chisq. (1 df) = 0.061 0.8045 
+  prevalence      173/690 (25.07%)      177/690 (25.65%)                                    
+                                                                                            
+Charlson                                                       Ranksum test          0.3498 
+  median(IQR)     6 (5,8)               6 (5,8)                                             
+                                                                                            
+Liver = YES                                                    Chisq. (1 df) = 1.487 0.2227 
+  prevalence      56/690 (8.12%)        69/690 (10%)                                        
+                                                                                            
+Diabetes = YES                                                 Chisq. (1 df) = 0.013 0.9096 
+  prevalence      235/690 (34.06%)      237/690 (34.35%)                                    
+                                                                                            
+
+BMI                                                            Ranksum test          0.6553 
+  median(IQR)     27.62 (24.52,31.64)   27.59 (24.17,31.29)                                 
+                                                                                            
+
+Hb_low                                                         Ranksum test          0.9803 
+  median(IQR)     8 (7.5,8.5)           8 (7.6,8.5)                                         
+                                                                                            
+Hb_max                                                         Ranksum test          0.7378 
+
+> ##绘制倾向性匹配分析生存分析图
+> surv.obj <- Surv(time = ps.Hbdata$Surtime,event = ps.Hbdata$Death28)
+> surv.treat <- survfit(surv.obj~truRed24,data=ps.Hbdata)
+> library(survminer)
+
+载入程辑包：‘survminer’
+
+The following object is masked from ‘package:survival’:
+
+    myeloma
+
+> ggsurvplot(surv.treat,data = ps.Hbdata, conf.int = TRUE, xlim = c(0, 30),
++            linetype = c("solid", "dashed"), break.time.by = 4,fun = "cumhaz",
++            risk.table = TRUE, risk.table.col="strata", ggtheme = theme_bw(),
++            pval = TRUE) 
+> survdiff(surv.obj~truRed24,data=ps.Hbdata)
+Call:
+survdiff(formula = surv.obj ~ truRed24, data = ps.Hbdata)
+
+                    N Observed Expected (O-E)^2/E (O-E)^2/V
+truRed24=未输血组 690      101       81      4.93      9.59
+truRed24=输血组   690       66       86      4.64      9.59
+
+ Chisq= 9.6  on 1 degrees of freedom, p= 0.002 
