@@ -26,3 +26,512 @@ The following objects are masked from ‘package:base’:
 > data$sepsis_shock <- factor(data$sepsis_shock,levels = c(0,1),labels =c("无","休克"))
 > data$truRed24 <- factor(data$truRed24,levels = c(0,1),labels =c("未输血组","输血组"))
 > # 提取血红蛋白水平在7-9g/dL
+ data.low <- filter(data,low_hb>=7,low_hb<=9)
+> names(data.low)
+ [1] "X"                          "subject_id"                 "hadm_id"                   
+ [4] "stay_id"                    "gender"                     "admission_age"             
+ [7] "hospital_expire_flag"       "sofa_score"                 "sepsis"                    
+[10] "lactate"                    "ph"                         "po2"                       
+[13] "pco2"                       "hematocrit"                 "hemoglobin"                
+[16] "hemoglobin_max"             "platelets"                  "wbc"                       
+[19] "bun"                        "creatinine"                 "glucose"                   
+[22] "sodium"                     "potassium"                  "pt"                        
+[25] "ptt"                        "mean_hb"                    "HR"                        
+[28] "SBP"                        "DBP"                        "MBP"                       
+[31] "RR"                         "T_min"                      "T_max"                     
+[34] "spo2"                       "weight"                     "height"                    
+[37] "apsiii"                     "aki"                        "vaso"                      
+[40] "sepsis_shock"               "ventil"                     "truRed"                    
+[43] "CHF"                        "COPD"                       "Renal"                     
+[46] "charlson_comorbidity_index" "Liver"                      "Diabetes"                  
+[49] "dod"                        "admittime"                  "dischtime"                 
+[52] "los_hospital"               "icu_intime"                 "icu_outtime"               
+[55] "los_icu"                    "suspected_infection_time"   "BMI"                       
+[58] "Hb"                         "surtime"                    "time"                      
+[61] "death"                      "death28"                    "truRed24"                  
+[64] "low_hb"                     "high_hb"                   
+> data.low <-data.low[,-1]
+> names<- c("subject_id" ,"hadm_id" ,"stay_id" ,"Sex" ,"Age" ,"hosDead" ,"SOFA" ,"Sepsis" ,"Lac" ,
++           "PH" ,"PO2" ,"PCO2" ,"HCT" ,"Hb" ,"Hb_max1" ,"PLT" ,"WBC" ,"BUN" ,"Cr" ,
++           "Glucose" ,"Na" ,"K" ,"PT" ,"APTT" ,"Hb_mean" ,"HR" ,"SBP" ,"DBP" ,"MBP" ,
++           "RR" ,"T_min" ,"T_max" ,"SPO2" ,"Weight" ,"Height" ,"SAPSiii" ,"AKI" ,"Vaso" ,"Shock" ,
++           "ventil" ,"truRed" ,"CHF" ,"COPD" ,"Renal" ,"Charlson",
++           "Liver" ,"Diabetes" ,"dod" ,"admittime" ,"dischtime" ,"los_hosp" ,
++           "icu_intime" ,"icu_outtime" ,"los_icu" ,"suspected_infection_time" ,
++           "BMI" ,"Hb" ,"Surtime" ,"Time" ,"Death" ,"Death28" ,"truRed24" ,"Hb_low" ,
++           "Hb_max" )
+> colnames(data.low) <- names
+> data.base <- select(data.low, Sex,Age ,SOFA,Lac, PH, PO2, PCO2, HCT, PLT, WBC, BUN,
++                     Cr, Glucose, Na, K, PT, APTT ,HR, SBP, DBP, MBP, RR, T_min,
++                     T_max, SPO2, SAPSiii, AKI, Vaso, Shock, ventil, CHF, COPD,
++                     Renal, Charlson, Liver, Diabetes, los_hosp, los_icu, BMI,
++                     Surtime, Death28, truRed24, Hb_low, Hb_max,hosDead,subject_id) 
+> names(data.base)
+> data.base$HD <- factor(data.base$hosDead, levels =c(0,1),labels = c("存活","死亡") )
+> # 描述各统计量
+> library("psych")
+> describeBy(data.base,data.base$HD)
+> data.base$D28 <- factor(data.base$Death28,levels=c(0,1),labels=c("No","Yes"))
+> library(epiDisplay)
+> table1 <- tableStack(vars=1:45, by=truRed24,dataFrame= data.base,prevalence = TRUE,test = TRUE,decimal=2)
+> table1
+                  未输血组               输血组                 Test stat.              P value
+Total             1873                   981                                                   
+                                                                                               
+Sex = M                                                         Chisq. (1 df) = 6.405   0.0114 
+  prevalence      930/1873 (49.65%)      536/981 (54.64%)                                      
+                                                                                               
+Age                                                             Ranksum test            0.0942 
+  median(IQR)     76.41 (70.79,82.69)    77.49 (71.65,83)                                      
+                                                                                               
+SOFA                                                            Ranksum test            0.1988 
+  median(IQR)     3 (2,5)                3 (2,5)                                               
+                                                                                               
+Lac                                                             Ranksum test            < 0.001
+  median(IQR)     2.2 (1.5,3.3)          2.9 (2,4.3)                                           
+                                                                                               
+PH                                                              Ranksum test            < 0.001
+  median(IQR)     7.33 (7.27,7.38)       7.31 (7.26,7.36)                                      
+                                                                                               
+PO2                                                             Ranksum test            0.0101 
+  median(IQR)     89 (70,116)            91 (74,120)                                           
+                                                                                               
+PCO2                                                            Ranksum test            < 0.001
+  median(IQR)     45 (40,51)             46 (42,51)                                            
+                                                                                               
+HCT                                                             Ranksum test            < 0.001
+  median(IQR)     25.4 (24,26.7)         23.4 (22.3,24.7)                                      
+                                                                                               
+PLT                                                             Ranksum test            < 0.001
+  median(IQR)     150 (108,214)          115 (85,162)                                          
+                                                                                               
+WBC                                                             Ranksum test            < 0.001
+  median(IQR)     9.6 (6.9,12.9)         9 (6.6,12)                                            
+                                                                                               
+BUN                                                             Ranksum test            < 0.001
+  median(IQR)     25 (17,43)             22 (16,34)                                            
+                                                                                               
+Cr                                                              Ranksum test            0.0034 
+  median(IQR)     1.2 (0.9,1.9)          1.1 (0.9,1.6)                                         
+                                                                                               
+Glucose                                                         Ranksum test            0.0026 
+  median(IQR)     110 (93,132)           114 (97,134)                                          
+                                                                                               
+Na                                                              Ranksum test            0.0966 
+  median(IQR)     137 (134,139)          137 (135,139)                                         
+                                                                                               
+K                                                               Ranksum test            0.4929 
+  median(IQR)     4 (3.7,4.3)            4 (3.6,4.3)                                           
+                                                                                               
+PT                                                              Ranksum test            < 0.001
+  median(IQR)     15.7 (14,18.1)         16.3 (14.8,19)                                        
+                                                                                               
+APTT                                                            Ranksum test            < 0.001
+  median(IQR)     34.7 (29.6,47)         39 (32.2,53.4)                                        
+                                                                                               
+HR                                                              Ranksum test            0.2306 
+  median(IQR)     81.92 (74.38,92.07)    82.48 (76.38,90.52)                                   
+                                                                                               
+SBP                                                             Ranksum test            < 0.001
+  median(IQR)     113.22 (106.38,120.48) 110.76 (104.95,117.84)                                
+                                                                                               
+DBP                                                             Ranksum test            < 0.001
+  median(IQR)     55.33 (50.58,60.58)    54.55 (49.8,59.06)                                    
+                                                                                               
+MBP                                                             Ranksum test            0.0121 
+  median(IQR)     72.6 (68.15,77.73)     71.72 (67.97,76.38)                                   
+                                                                                               
+RR                                                              Ranksum test            < 0.001
+  median(IQR)     18.46 (16.38,21.29)    17.55 (15.71,19.63)                                   
+                                                                                               
+T_min                                                           Ranksum test            < 0.001
+  median(IQR)     36.33 (35.61,36.56)    36 (35.28,36.44)                                      
+                                                                                               
+T_max                                                           Ranksum test            0.0021 
+  median(IQR)     37.22 (36.94,37.72)    37.39 (37,37.8)                                       
+                                                                                               
+SPO2                                                            Ranksum test            < 0.001
+  median(IQR)     93 (90,95)             93 (91,96)                                            
+                                                                                               
+SAPSiii                                                         Ranksum test            0.1508 
+  median(IQR)     51 (36,74)             50 (35,73)                                            
+                                                                                               
+AKI = YES                                                       Chisq. (1 df) = 20.269  < 0.001
+  prevalence      930/1873 (49.65%)      574/981 (58.51%)                                      
+                                                                                               
+Vaso                                                            Ranksum test            0.0028 
+  median(IQR)     0 (0,0)                0 (0,0)                                               
+                                                                                               
+Shock = 休克                                                    Chisq. (1 df) = 8.003   0.0047 
+  prevalence      332/1873 (17.73%)      217/981 (22.12%)                                      
+                                                                                               
+ventil = YES                                                    Chisq. (1 df) = 105.447 < 0.001
+  prevalence      1144/1873 (61.08%)     785/981 (80.02%)                                      
+                                                                                               
+CHF = YES                                                       Chisq. (1 df) = 4.717   0.0299 
+  prevalence      715/1873 (38.17%)      334/981 (34.05%)                                      
+                                                                                               
+COPD = YES                                                      Chisq. (1 df) = 0.479   0.4888 
+  prevalence      554/1873 (29.58%)      278/981 (28.34%)                                      
+                                                                                               
+Renal = YES                                                     Chisq. (1 df) = 9.2     0.0024 
+  prevalence      583/1873 (31.13%)      252/981 (25.69%)                                      
+                                                                                               
+Charlson                                                        Ranksum test            < 0.001
+  median(IQR)     7 (5,9)                6 (5,8)                                               
+                                                                                               
+Liver = YES                                                     Chisq. (1 df) = 1.628   0.202  
+  prevalence      169/1873 (9.02%)       103/981 (10.5%)                                       
+                                                                                               
+Diabetes = YES                                                  Chisq. (1 df) = 17.317  < 0.001
+  prevalence      746/1873 (39.83%)      313/981 (31.91%)                                      
+                                                                                                                                                                                                                       
+BMI                                                             Ranksum test            0.2529 
+  median(IQR)     27.89 (24.22,32.39)    27.58 (24.27,31.22)                                   
+                                                                                                                  
+Hb_low                                                          Ranksum test            < 0.001
+  median(IQR)     8.3 (7.8,8.7)          7.9 (7.5,8.4)                                         
+                                                                                               
+Hb_max                                                          Ranksum test            < 0.001
+  median(IQR)     9.9 (9,10.9)           10.5 (9.6,11.4)                                       
+                                                                                                                                                                                                                                         
+> write.csv(table1,file = "table1.csv")
+> ##for 循环做wilcox计算
+> options(scipen=999)
+> for (i in 1:ncol(data.base)){
++   if(is.numeric(data.base[,i])){print(colnames(data.base)[i]);
++     print(wilcox.test(data.base[[i]]~truRed24,data = data.base)) }
++   }
+[1] "Age"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 883711, p-value = 0.09418
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "SOFA"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 892462, p-value = 0.1988
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "Lac"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 690937, p-value < 0.00000000000000022
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "PH"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 1029613, p-value = 0.0000001106
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "PO2"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 864915, p-value = 0.01009
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "PCO2"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 846647, p-value = 0.0005629
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "HCT"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 1390792, p-value < 0.00000000000000022
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "PLT"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 1168649, p-value < 0.00000000000000022
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "WBC"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 1007341, p-value = 0.00002242
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "BUN"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 1013897, p-value = 0.000005254
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "Cr"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 979825, p-value = 0.003408
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "Glucose"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 855818, p-value = 0.00263
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "Na"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 884079, p-value = 0.09658
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "K"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 933020, p-value = 0.4929
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "PT"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 791245, p-value = 0.000000001084
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "APTT"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 755380, p-value = 0.000000000000005626
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "HR"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 893640, p-value = 0.2306
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "SBP"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 1031520, p-value = 0.00000006829
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "DBP"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 992339, p-value = 0.0004288
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "MBP"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 971146, p-value = 0.01214
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "RR"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 1063629, p-value = 0.000000000004169
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "T_min"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 1086933, p-value = 0.0000000000000008328
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "T_max"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 854514, p-value = 0.002132
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "SPO2"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 815085, p-value = 0.0000006474
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "SAPSiii"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 948743, p-value = 0.1508
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "Vaso"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 881280, p-value = 0.002765
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "Charlson"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 994421, p-value = 0.0002578
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "Hb_low"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 1170860, p-value < 0.00000000000000022
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "Hb_max"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  data.base[[i]] by truRed24
+W = 713132, p-value < 0.00000000000000022
+alternative hypothesis: true location shift is not equal to 0
+
+##血红蛋白最低值分布情况
+library(ggplot2)
+library(ggsci)
+library(patchwork)
+#直方图绘制
+Hb.hist<- ggplot(data =data.base,aes(x=Hb_low))+geom_histogram(alpha = 0.7,binwidth = 0.1,
+                aes(y=..density..,fill=truRed24),color="white",position = "identity")+
+  scale_color_manual(values = c("red", "#00468BE5"))+
+  scale_fill_manual(values = c("orange", "#0099B4E5"))+
+  geom_density(alpha = 1,linewidth=1,aes(color=truRed24))+labs(x="Hb(g/dL)")+theme_bw()+
+  theme(axis.text = element_text(size = 16),axis.title = element_text(size = 20),
+        legend.title = element_blank(),legend.text = element_text(size=14))
+Hb.hist
+#箱线图绘制
+options(scipen=999)
+library(ggpubr)
+compare <- list(c("未输血组","输血组"))
+boxgraph <-   ggboxplot(data.base,x="truRed24",y="Hb_low",color ="truRed24",size = 1,bxp.errorbar=TRUE)+
+  scale_color_manual(values = c("red", "#00468BE5"))+
+  stat_compare_means(comparisons = compare,method = "wilcox.test",
+                     symnum.args = list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1),
+                                        symbols = c("***", "**", "*", ".", "ns")),
+                     bracket.size = 0.8,tip.length = 0.05)+
+  theme_bw()+labs(x="",y="Hb(d/dL)")+ylim(6,10)+
+  theme(axis.text = element_text(size = 16),axis.title = element_text(size = 20),
+        legend.title = element_blank(),legend.text = element_text(size = 14))
+boxgraph
+
+#将血红蛋白分组
+data.base$Hb_group <- cut(data.base$Hb_low,breaks=c(7,8,9),right = TRUE,include.lowest=TRUE)
+
+#查看不同血红蛋白浓度输血组未输血组死亡率
+table.p <- table(data.base$truRed24)
+prop.table(table.p)
+##绘制频数图
+Hb.bar <- ggplot(data.base,aes(x=truRed24,fill=HD))+
+  geom_bar(position = "fill")+scale_fill_brewer()+facet_grid(~Hb_group)+theme_bw()+
+  labs(x= "24小时内输血",y="患者比例")
+Hb.bar
+
+> ###计算输血与死亡关系
+> table.truRed24<- table(data.base$truRed24,data.base$HD)
+> addmargins(table.truRed24)
+          
+           存活 死亡  Sum
+  未输血组 1526  347 1873
+  输血组    864  117  981
+  Sum      2390  464 2854
+> prop.table(table.truRed24,margin=1)
+          
+                存活      死亡
+  未输血组 0.8147357 0.1852643
+  输血组   0.8807339 0.1192661
+> prop.table(table.truRed24,margin=2)
+          
+                存活      死亡
+  未输血组 0.6384937 0.7478448
+  输血组   0.3615063 0.2521552
+> chisq.test(table.truRed24)
+
+	Pearson's Chi-squared test with Yates' continuity correction
+
+data:  table.truRed24
+X-squared = 20.115, df = 1, p-value = 0.000007291
+
+> tabpct(data.base$truRed24,data.base$HD)
+
+Original table 
+                  data.base$HD
+data.base$truRed24  存活  死亡  Total
+          未输血组  1526   347   1873
+          输血组     864   117    981
+          Total     2390   464   2854
+
+Row percent 
+                  data.base$HD
+data.base$truRed24    存活    死亡  Total
+          未输血组    1526     347   1873
+                    (81.5)  (18.5)  (100)
+          输血组       864     117    981
+                    (88.1)  (11.9)  (100)
+
+Column percent 
+                  data.base$HD
+data.base$truRed24  存活       %  死亡       %
+          未输血组  1526  (63.8)   347  (74.8)
+          输血组     864  (36.2)   117  (25.2)
+          Total     2390   (100)   464   (100)
+
+> cc(data.base$HD,data.base$truRed24)
+
+            data.base$truRed24
+data.base$HD 未输血组 输血组 Total
+       存活      1526    864  2390
+       死亡       347    117   464
+       Total     1873    981  2854
+
+OR =  0.6 
+95% CI =  0.48, 0.75  
+Chi-squared = 20.6, 1 d.f., P value = 0
+Fisher's exact test (2-sided) P value = 0 
