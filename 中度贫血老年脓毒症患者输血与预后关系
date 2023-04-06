@@ -1038,6 +1038,240 @@ Hb_low                                                         Ranksum test     
                                                                                             
 Hb_max                                                         Ranksum test          0.7378 
 
+
+> ##for 循环做wilcox计算
+> options(scipen=999)
+> for (i in 1:ncol(ps.Hbdata)){
++   if(is.numeric(ps.Hbdata[,i])){print(colnames(ps.Hbdata)[i]);
++     print(wilcox.test(ps.Hbdata[[i]]~truRed24,data = ps.Hbdata)) }
++ }
+[1] "Age"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 230180, p-value = 0.2877
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "SOFA"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 232560, p-value = 0.4473
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "Lac"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 229360, p-value = 0.2403
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "PH"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 243705, p-value = 0.4446
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "PO2"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 241112, p-value = 0.6792
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "PCO2"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 232030, p-value = 0.4157
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "HCT"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 240768, p-value = 0.7135
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "PLT"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 245941, p-value = 0.2865
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "WBC"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 232188, p-value = 0.4284
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "BUN"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 232104, p-value = 0.4216
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "Cr"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 233694, p-value = 0.5554
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "Glucose"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 230528, p-value = 0.3095
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "Na"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 233693, p-value = 0.5547
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "K"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 234644, p-value = 0.6448
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "PT"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 234853, p-value = 0.6658
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "APTT"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 232371, p-value = 0.443
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "HR"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 239925, p-value = 0.8001
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "SBP"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 246040, p-value = 0.2805
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "DBP"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 241590, p-value = 0.6326
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "MBP"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 240902, p-value = 0.7001
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "RR"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 243502, p-value = 0.4614
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "T_min"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 239093, p-value = 0.888
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "T_max"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 232550, p-value = 0.4574
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "SPO2"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 227344, p-value = 0.1462
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "SAPSiii"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 231082, p-value = 0.3465
+alternative hypothesis: true location shift is not equal to 0
+
+[1] "Charlson"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 231199, p-value = 0.3498
+alternative hypothesis: true location shift is not equal to 0
+
+
+[1] "BMI"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 241355, p-value = 0.6553
+alternative hypothesis: true location shift is not equal to 0
+
+
+
+[1] "Hb_low"
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  ps.Hbdata[[i]] by truRed24
+W = 237867, p-value = 0.9803
+alternative hypothesis: true location shift is not equal to 0
+
 > ##绘制倾向性匹配分析生存分析图
 > surv.obj <- Surv(time = ps.Hbdata$Surtime,event = ps.Hbdata$Death28)
 > surv.treat <- survfit(surv.obj~truRed24,data=ps.Hbdata)
