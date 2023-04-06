@@ -665,3 +665,214 @@ DiabetesYES    0.783030066 0.54275864 1.12505293
 BMI            0.876632872 0.74567449 1.02705764
 Hb_low         0.869186626 0.67872687 1.11266070
 Hb_max         0.876491358 0.73301637 1.04515278
+###逐步回归法筛除变量
+glm.step<- step(fit.glm,direction = "both")
+summary(glm.step)
+exp(cbind(OR=coef(glm.step),confint(glm.step)))
+summary(glm.step)
+
+Call:
+glm(formula = HD ~ truRed24 + Age + Lac + HCT + BUN + Cr + K + 
+    PT + SBP + DBP + RR + SPO2 + SAPSiii + AKI + Shock + ventil + 
+    Renal + Charlson + Liver + BMI + Hb_max, family = "binomial", 
+    data = train)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-2.4308  -0.4275  -0.2369  -0.1323   3.0159  
+
+Coefficients:
+               Estimate Std. Error z value             Pr(>|z|)    
+(Intercept)    -4.74822    0.35320 -13.444 < 0.0000000000000002 ***
+truRed24输血组 -0.53393    0.20153  -2.649             0.008064 ** 
+Age             0.23001    0.08223   2.797             0.005155 ** 
+Lac             0.13686    0.08024   1.706             0.088075 .  
+HCT             0.20357    0.08387   2.427             0.015218 *  
+BUN             0.30810    0.09817   3.138             0.001699 ** 
+Cr             -0.28990    0.10759  -2.694             0.007052 ** 
+K              -0.11436    0.07640  -1.497             0.134431    
+PT              0.17380    0.06310   2.755             0.005876 ** 
+SBP            -0.18029    0.08359  -2.157             0.031017 *  
+DBP             0.15079    0.08027   1.879             0.060301 .  
+RR              0.26597    0.07995   3.327             0.000878 ***
+SPO2           -0.16404    0.07159  -2.292             0.021932 *  
+SAPSiii         0.87163    0.09238   9.435 < 0.0000000000000002 ***
+AKIYES          0.50788    0.17942   2.831             0.004645 ** 
+Shock休克       0.61736    0.18511   3.335             0.000853 ***
+ventilYES       0.97807    0.19940   4.905        0.00000093406 ***
+RenalYES       -0.58154    0.20534  -2.832             0.004625 ** 
+Charlson        0.22094    0.03826   5.775        0.00000000771 ***
+LiverYES        0.46613    0.22704   2.053             0.040069 *  
+BMI            -0.15980    0.07662  -2.086             0.037011 *  
+Hb_max         -0.16874    0.08478  -1.990             0.046554 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 1774.5  on 1997  degrees of freedom
+Residual deviance: 1119.3  on 1976  degrees of freedom
+AIC: 1163.3
+
+Number of Fisher Scoring iterations: 6
+
+> exp(cbind(OR=coef(glm.step),confint(glm.step)))
+Waiting for profiling to be done...
+                        OR       2.5 %     97.5 %
+(Intercept)    0.008667085 0.004262732 0.01704337
+truRed24输血组 0.586297888 0.393273042 0.86734222
+Age            1.258606733 1.071651359 1.47968407
+Lac            1.146665227 0.980663754 1.34378901
+HCT            1.225775819 1.040296863 1.44569497
+BUN            1.360843338 1.122890410 1.65091648
+Cr             0.748338429 0.601917260 0.91849483
+K              0.891938044 0.767539406 1.03576260
+PT             1.189821509 1.052004966 1.34800170
+SBP            0.835024499 0.707262920 0.98171903
+DBP            1.162752998 0.993300667 1.36091591
+RR             1.304701863 1.115914563 1.52710973
+SPO2           0.848707007 0.736521616 0.97572958
+SAPSiii        2.390806183 1.998441597 2.87154578
+AKIYES         1.661769969 1.172069904 2.37027839
+Shock休克      1.854024672 1.287884667 2.66246579
+ventilYES      2.659321907 1.810185674 3.95921813
+RenalYES       0.559038002 0.372455835 0.83354774
+Charlson       1.247243766 1.157573681 1.34510794
+LiverYES       1.593810271 1.017145885 2.47953073
+BMI            0.852315575 0.732098601 0.98886204
+Hb_max         0.844725621 0.714430125 0.99645922
+> ##显示每一步模型变化
+> stepanova <- glm.step$anova
+> stepanova$Step <- as.factor(stepanova$Step)
+> ggplot(stepanova,aes(x=reorder(Step,-AIC),y=AIC))+theme_bw(base_family = "STKaiti",base_size = 12)+
++   geom_point(colours="red",size=2)+geom_text(aes(y=AIC-1,label=round(AIC,2)))+
++   theme(axis.text.x = element_text(angle = 30,size=12))+labs(x="删除的特征")
+##共线性诊断
+> library(car)
+> vif(glm.step)
+truRed24      Age      Lac      HCT      BUN       Cr        K       PT      SBP      DBP       RR     SPO2  SAPSiii 
+1.403137 1.178307 1.471995 1.292565 1.995383 2.023629 1.116215 1.095197 1.229353 1.231763 1.218132 1.110389 1.276559 
+     AKI    Shock   ventil    Renal Charlson    Liver      BMI   Hb_max 
+1.128667 1.270458 1.224068 1.651874 1.493150 1.134946 1.105465 1.303685 
+> ##预测模型在测试集表现
+> library(forecast)
+> pre.glm.step <- predict(glm.step,test,type = "response")
+> pre.glm.step2<- ifelse(pre.glm.step>0.5,1,0)
+> pre.glm.step2 <- factor(pre.glm.step2,levels = c(0,1),labels = c("存活","死亡"))
+> confusionMatrix(test$HD,pre.glm.step2)
+Confusion Matrix and Statistics
+
+          Reference
+Prediction 存活 死亡
+      存活  688   29
+      死亡   75   64
+                                          
+               Accuracy : 0.8785          
+                 95% CI : (0.8547, 0.8996)
+    No Information Rate : 0.8914          
+    P-Value [Acc > NIR] : 0.8953          
+                                          
+                  Kappa : 0.4846          
+                                          
+ Mcnemar's Test P-Value : 0.00001021      
+                                          
+            Sensitivity : 0.9017          
+            Specificity : 0.6882          
+         Pos Pred Value : 0.9596          
+         Neg Pred Value : 0.4604          
+             Prevalence : 0.8914          
+         Detection Rate : 0.8037          
+   Detection Prevalence : 0.8376          
+      Balanced Accuracy : 0.7949          
+                                          
+       'Positive' Class : 存活   
+       
+       > #删除多于变量
+> rm(fit.glm,glm.step,Hb.barAKI,Hb.hist,index,names,pre.glm.step,pre.glm.step2,rm,
++    stepanova,table.AKI,table.p,table.truRed24,test,train)
+
+##倾向性匹配分析
+> options(scipen=999)  #转为科学计数法
+> # install.packages("Matching")
+> library(MatchIt)
+> ##建立倾向匹配分析模型
+> set.seed(1111)
+> ps.Hb <-matchit(data=data.base,
++                 truRed24~Sex +Age +SOFA +Lac +PH +PO2 +PCO2 +HCT +PLT +WBC +
++                   BUN +Cr +Glucose +Na +K + +PT +APTT +HR +SBP +DBP +
++                   MBP +RR +T_min +T_max +SPO2 +SAPSiii +AKI +Shock +ventil+
++                   +CHF +COPD +Renal +Charlson+Liver +Diabetes +
++                   BMI+Hb_low +Hb_max,method="nearest",distance = "logit",replace=FALSE,caliper=0.1,ratio = 1)
+> summary(ps.Hb,un = FALSE)
+
+Call:
+matchit(formula = truRed24 ~ Sex + Age + SOFA + Lac + PH + PO2 + 
+    PCO2 + HCT + PLT + WBC + BUN + Cr + Glucose + Na + K + +PT + 
+    APTT + HR + SBP + DBP + MBP + RR + T_min + T_max + SPO2 + 
+    SAPSiii + AKI + Shock + ventil + +CHF + COPD + Renal + Charlson + 
+    Liver + Diabetes + BMI + Hb_low + Hb_max, data = data.base, 
+    method = "nearest", distance = "logit", replace = FALSE, 
+    caliper = 0.1, ratio = 1)
+
+Summary of Balance for Matched Data:
+            Means Treated Means Control Std. Mean Diff. Var. Ratio eCDF Mean eCDF Max Std. Pair Dist.
+distance           0.4328        0.4229          0.0421     1.0960    0.0078   0.0406          0.0425
+SexF               0.4667        0.4638          0.0058          .    0.0029   0.0029          0.9665
+SexM               0.5333        0.5362         -0.0058          .    0.0029   0.0029          0.9665
+Age               77.3829       77.0020          0.0532     1.0327    0.0198   0.0449          1.2040
+SOFA               3.9275        3.8449          0.0397     1.0109    0.0087   0.0304          0.9472
+Lac                3.2055        3.1874          0.0075     0.8162    0.0118   0.0609          0.8411
+PH                 7.3057        7.3084         -0.0283     0.9681    0.0072   0.0377          0.9957
+PO2              102.0304      102.4797         -0.0108     1.0323    0.0106   0.0348          1.0685
+PCO2              46.6522       46.0783          0.0605     1.0287    0.0074   0.0377          1.0759
+HCT               24.0167       24.0297         -0.0072     1.0060    0.0062   0.0377          0.7437
+PLT              143.6797      144.2696         -0.0079     1.0860    0.0140   0.0638          0.9879
+WBC                9.9938       10.0170         -0.0044     0.7658    0.0113   0.0435          1.0181
+BUN               29.7246       29.9942         -0.0122     0.9172    0.0097   0.0493          0.9352
+Cr                 1.5229        1.5257         -0.0022     0.9877    0.0060   0.0377          0.8254
+Glucose          117.5159      117.6942         -0.0050     0.8027    0.0120   0.0478          1.0560
+Na               136.7957      136.7232          0.0184     0.8824    0.0056   0.0319          1.1067
+K                  3.9858        3.9678          0.0345     0.9228    0.0065   0.0246          1.1462
+PT                18.3378       18.1746          0.0187     1.0428    0.0057   0.0348          0.7392
+APTT              48.8238       48.9314         -0.0034     0.9120    0.0110   0.0493          0.8866
+HR                84.0614       84.3579         -0.0229     0.9506    0.0124   0.0319          1.1084
+SBP              112.7270      112.7251          0.0002     1.2740    0.0246   0.0609          1.0764
+DBP               54.7640       54.8615         -0.0133     1.1261    0.0133   0.0377          1.1473
+MBP               72.4480       72.4544         -0.0009     1.0411    0.0093   0.0435          1.1465
+RR                18.1842       18.4337         -0.0764     0.8298    0.0162   0.0478          1.1127
+T_min             35.8842       35.8645          0.0198     0.7333    0.0064   0.0232          0.9411
+T_max             37.4254       37.4249          0.0007     1.0034    0.0096   0.0507          1.0522
+SPO2              92.0188       91.7319          0.0415     1.0746    0.0075   0.0435          0.8323
+SAPSiii           54.4841       54.7739         -0.0113     0.7715    0.0194   0.0551          1.1317
+AKINO              0.4377        0.4391         -0.0029          .    0.0014   0.0014          0.9913
+AKIYES             0.5623        0.5609          0.0029          .    0.0014   0.0014          0.9913
+Shock无            0.7986        0.8116         -0.0314          .    0.0130   0.0130          0.7228
+Shock休克          0.2014        0.1884          0.0314          .    0.0130   0.0130          0.7228
+ventilNO           0.2623        0.2826         -0.0507          .    0.0203   0.0203          0.8482
+ventilYES          0.7377        0.7174          0.0507          .    0.0203   0.0203          0.8482
+CHFNO              0.6623        0.6667         -0.0092          .    0.0043   0.0043          0.9267
+CHFYES             0.3377        0.3333          0.0092          .    0.0043   0.0043          0.9267
+COPDNO             0.7174        0.7203         -0.0064          .    0.0029   0.0029          0.8748
+COPDYES            0.2826        0.2797          0.0064          .    0.0029   0.0029          0.8748
+RenalNO            0.7435        0.7493         -0.0133          .    0.0058   0.0058          0.8160
+RenalYES           0.2565        0.2507          0.0133          .    0.0058   0.0058          0.8160
+Charlson           6.6971        6.6406          0.0263     0.8469    0.0135   0.0507          1.1983
+LiverNO            0.9000        0.9188         -0.0615          .    0.0188   0.0188          0.5531
+LiverYES           0.1000        0.0812          0.0615          .    0.0188   0.0188          0.5531
+DiabetesNO         0.6565        0.6594         -0.0062          .    0.0029   0.0029          0.8768
+DiabetesYES        0.3435        0.3406          0.0062          .    0.0029   0.0029          0.8768
+BMI               28.3774       28.6472         -0.0467     0.8364    0.0081   0.0304          1.1341
+Hb_low             8.0052        8.0030          0.0039     0.9178    0.0132   0.0261          1.0685
+Hb_max            10.4117       10.4078          0.0027     0.8695    0.0118   0.0522          1.0743
+
+Sample Sizes:
+          Control Treated
+All          1873     981
+Matched       690     690
+Unmatched    1183     291
+Discarded       0       0
+#显示匹配效果
+plot(ps.Hb, type = "jitter") #散点图检查匹配效果
+plot(ps.Hb, type = "qq", interactive=FALSE) qq图显示匹配效果
+plot(ps.Hb, type='hist') 直方图显示匹配效果
+plot(summary(ps.Hb))
